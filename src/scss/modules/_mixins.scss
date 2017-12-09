@@ -1,0 +1,52 @@
+//reset margin and padding, maybe other stuff
+@mixin reset() {
+  margin: 0;
+  padding: 0;
+}
+
+//header background
+@mixin headerBackground($url, $opacity) {
+  position: relative;
+  opacity: 1;
+  &::before {
+    position: absolute;
+    background: url($url) no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-attachment: fixed;
+    width: 100%;
+    height: 100%;
+    content: '';
+    opacity: $opacity;
+    z-index: -1;
+    // filter: saturate(.5);
+  }
+}
+
+//triangle
+
+/// Triangle helper mixin
+/// @param {Direction} $direction - Triangle direction, either `top`, `right`, `bottom` or `left`
+/// @param {Color} $color [currentcolor] - Triangle color
+/// @param {Length} $size [1em] - Triangle size
+@mixin triangle($direction, $color: currentcolor, $size: 1em) {
+  @if not index(top right bottom left, $direction) {
+    @error "Direction must be either `top`, `right`, `bottom` or `left`.";
+  }
+  width: 0;
+  height: 0;
+  content: '';
+  position: absolute;
+  transform: translate(-50%, 0);
+  border-#{opposite-direction($direction)}: ($size) solid $color;
+
+  $perpendicular-borders: $size solid transparent;
+
+  @if $direction == top or $direction == bottom {
+    border-left:   $perpendicular-borders;
+    border-right:  $perpendicular-borders;
+  } @else if $direction == right or $direction == left {
+    border-bottom: $perpendicular-borders;
+    border-top:    $perpendicular-borders;
+  }
+}

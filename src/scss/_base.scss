@@ -1,0 +1,21 @@
+//import font
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+
+// import modules
+@import "modules/animations";
+@import "modules/functions";
+@import "modules/variables";
+@import "modules/mixins";
+@import "modules/classes";
+
+
+//import sections
+@import "partials/sections/nav";
+@import "partials/sections/footer"
+
+// import IE and media queries stuff
+@import "partials/media";
+@import "partials/ie";
+
+//import third-party stuff
+	// import bootstrap etc
