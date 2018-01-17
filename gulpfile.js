@@ -31,21 +31,27 @@ var config = {
   scssout: 'src/css/',
   cssoutname: 'style.css',
   jsoutname: 'script.js',
+  docsin: 'src/docs/*.pdf',
+  docsout: 'dist/docs',
   cssreplaceout: 'css/style.css',
   jsreplaceout: 'js/script.js'
 };
 
 // setup php server
-gulp.task('php', function(){
-   php.server({ base: 'src', port: 8010, keepalive: true});
+gulp.task('php', function () {
+  php.server({
+    base: 'src',
+    port: 8010,
+    keepalive: true
+  });
 });
 
 // browsersync reload
-gulp.task('reload', function() {
+gulp.task('reload', function () {
   browserSync.reload();
 });
 
-gulp.task('serve', ['sass', 'php'], function() {
+gulp.task('serve', ['sass', 'php'], function () {
   browserSync({
     cors: true,
     open: false,
@@ -57,7 +63,7 @@ gulp.task('serve', ['sass', 'php'], function() {
   gulp.watch(config.scssin, ['sass']);
 });
 
-gulp.task('sass', function() {
+gulp.task('sass', function () {
   return gulp.src(config.scssin)
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
@@ -69,28 +75,28 @@ gulp.task('sass', function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task('css', function() {
+gulp.task('css', function () {
   return gulp.src(config.cssin)
     .pipe(concat(config.cssoutname))
     .pipe(cleanCSS())
     .pipe(gulp.dest(config.cssout));
 });
 
-gulp.task('js', function() {
+gulp.task('js', function () {
   return gulp.src(config.jsin)
     .pipe(concat(config.jsoutname))
     .pipe(babili())
     .pipe(gulp.dest(config.jsout));
 });
 
-gulp.task('img', function() {
+gulp.task('img', function () {
   return gulp.src(config.imgin)
     .pipe(changed(config.imgout))
     .pipe(imagemin())
     .pipe(gulp.dest(config.imgout));
 });
 
-gulp.task('html', function() {
+gulp.task('html', function () {
   return gulp.src(config.htmlin)
     .pipe(htmlReaplce({
       'css': config.cssreplaceout,
@@ -104,12 +110,26 @@ gulp.task('html', function() {
     .pipe(gulp.dest(config.dist));
 });
 
-gulp.task('clean', function() {
+gulp.task('clean', function () {
   return del([config.dist]);
 });
 
-gulp.task('dist', function() {
-  sequence('clean', ['html', 'js' , 'css', 'img']);
+gulp.task('docs', function () {
+  return gulp.src(config.docsin)
+    .pipe(gulp.dest(config.docsout));
+});
+
+gulp.task('movephp', function () {
+  return gulp.src([config.phpin, 'src/*.txt', ])
+    .pipe(gulp.dest(config.htmlout));
+});
+gulp.task('move', function () {
+  return gulp.src(['src/lib/**/*.*'])
+    .pipe(gulp.dest('dist/lib/'));
+});
+
+gulp.task('build', function () {
+  sequence('clean', ['html', 'js', 'css', 'img', 'move', 'movephp', 'docs']);
 });
 
 gulp.task('default', ['serve']);

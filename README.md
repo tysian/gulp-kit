@@ -12,7 +12,7 @@ gulp
 
 ## Build 
 ```
-gulp dist
+gulp build
 ```
 
 I dont know why u r there :heart:
