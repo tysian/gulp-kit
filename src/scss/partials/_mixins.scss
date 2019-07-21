@@ -1,0 +1,174 @@
+//reset margin and padding, maybe other stuff
+@mixin reset() {
+	margin: 0;
+	padding: 0;
+}
+
+//Google Material Shadow
+@mixin material_shadow ($level) {
+	@if $level==1 {
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+	}
+
+	@else if $level==2 {
+		box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	}
+
+	@else if $level==3 {
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+	}
+
+	@else if $level==4 {
+		box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+	}
+
+	@else if $level==5 {
+		box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+	}
+}
+
+//opacity background
+@mixin opacityBackground($color: black, $opacity: .25) {
+	position: relative;
+	opacity: 1;
+
+	&::before {
+		content: '';
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		opacity: $opacity;
+		background-color: $color;
+
+	}
+}
+
+@mixin gradientFromBottom($top-opacity: 0, $bottom-opacity: 0.7) {
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: -moz-linear-gradient(top, rgba(0, 0, 0, $top-opacity) 0%, rgba(0, 0, 0, $bottom-opacity) 100%);
+		background: -webkit-linear-gradient(top, rgba(0, 0, 0, $top-opacity) 0%, rgba(0, 0, 0, $bottom-opacity) 100%);
+		background: linear-gradient(to bottom, rgba(0, 0, 0, $top-opacity) 0%, rgba(0, 0, 0, $bottom-opacity) 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=0);
+	}
+}
+
+//triangle
+/// Triangle helper mixin
+/// @param {Direction} $direction - Triangle direction, either `top`, `right`, `bottom` or `left`
+/// @param {Color} $color [currentcolor] - Triangle color
+/// @param {Length} $size [1em] - Triangle size
+@mixin triangle($direction, $color: currentcolor, $size: 1em) {
+	@if not index(top right bottom left, $direction) {
+		@error "Direction must be either `top`, `right`, `bottom` or `left`.";
+	}
+
+	width: 0;
+	height: 0;
+	content: '';
+	position: absolute;
+	transform: translate(-50%, 0);
+	border-#{opposite-direction($direction)}: ($size) solid $color;
+	$perpendicular-borders: $size solid transparent;
+
+	@if $direction==top or $direction==bottom {
+		border-left: $perpendicular-borders;
+		border-right: $perpendicular-borders;
+	}
+
+	@else if $direction==right or $direction==left {
+		border-bottom: $perpendicular-borders;
+		border-top: $perpendicular-borders;
+	}
+}
+
+$laptop-max: 1600px;
+$laptop-1366: 1366px;
+$laptop-middle: 1199px;
+$laptop-min: 1025px;
+$tablet-max: 1024px;
+$tablet-middle: 991px;
+$tablet-min: 768px;
+$mobile-max: 767px;
+$mobile-sm-max: 575px;
+$mobile-xs-max: 350px;
+
+
+@mixin mobile-xs {
+	@media (max-width: $mobile-xs-max) {
+		@content;
+	}
+}
+
+@mixin mobile-sm {
+	@media (max-width: $mobile-sm-max) {
+		@content;
+	}
+}
+
+@mixin mobile {
+	@media (max-width: $mobile-max) {
+		@content;
+	}
+}
+
+@mixin tablet {
+	@media (max-width: $tablet-max) {
+		@content;
+	}
+}
+
+@mixin tablet-only {
+	@media (max-width: $tablet-max) and (min-width: $tablet-min) {
+		@content;
+	}
+}
+
+@mixin tablet-middle {
+	@media (max-width: $tablet-middle) {
+		@content;
+	}
+}
+
+@mixin tablet-and-greater {
+	@media (min-width: $tablet-min) {
+		@content;
+	}
+}
+
+@mixin laptop {
+	@media (max-width: $laptop-max) {
+		@content;
+	}
+}
+
+@mixin laptop-only {
+	@media (max-width: $laptop-max) and (min-width: $laptop-min) {
+		@content;
+	}
+}
+
+@mixin laptop-and-greater {
+	@media (min-width: $laptop-min) {
+		@content;
+	}
+}
+
+@mixin laptop-middle {
+	@media (max-width: $laptop-middle) {
+		@content;
+	}
+}
+
+@mixin laptop-1366 {
+	@media (max-width: $laptop-1366) {
+		@content;
+	}
+}

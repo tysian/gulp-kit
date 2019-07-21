@@ -1,21 +1,39 @@
-//import font
-@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+// IMPORT FONT
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700');
 
-// import modules
-@import "modules/animations";
-@import "modules/functions";
-@import "modules/variables";
-@import "modules/mixins";
-@import "modules/classes";
+// IMPORT MODULES
+@import "partials/variables";
+@import "partials/functions";
+@import "partials/mixins";
+@import "partials/animations";
 
-
-//import sections
-@import "partials/sections/nav";
-@import "partials/sections/footer";
-
-// import IE and media queries stuff
-@import "partials/media";
+// IMPORT IE AND MEDIA QUERIES STUFF
 @import "partials/ie";
 
-//import third-party stuff
-	// import bootstrap etc
+// IMPORT PARTIALS
+@import "partials/buttons";
+@import "partials/default-styles";
+
+// IMPORT PAGES 
+@import "pages/frontpage";
+@import "pages/subpage";
+
+// IMPORT SECTIONS
+@import "pages/sections/nav";
+@import "pages/sections/footer";
+
+// SETUP
+html {
+    font-size: 62.5%;
+    @include tablet() {
+        font-size: 55%;
+    }
+}
+
+
+body {
+    background-color: $almostwhite;
+    color: $almostblack;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 1.6rem;
+}

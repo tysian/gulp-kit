@@ -1,0 +1,18 @@
+section {
+
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    font-weight: bold;
+    color: $text-dark;
+}
+
+@for $i from 1 through 6 {
+    h#{7 - $i} {
+        font-size: $i * .8rem + 1.6;
+    }
+}

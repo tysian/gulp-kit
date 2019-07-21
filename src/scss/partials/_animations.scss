@@ -1,0 +1,36 @@
+/// @param {Direction} $direction - Where element come from: `top`, `right`, `bottom` or `left`
+
+@mixin animate-from($direction) {
+    opacity: 0;
+    transition: .5s ease-in-out;
+    &.animated {
+        opacity: 1;
+    }
+    @if $direction==top {
+        transform: translateY(-50px);
+        &.animated {
+            transform: translateY(0);
+        }
+	}
+
+	@else if $direction==right {
+        transform: translateX(50px);
+        &.animated {
+            transform: translateX(0);
+        }
+    }
+    
+	@else if $direction==bottom {
+        transform: translateY(50px);
+        &.animated {
+            transform: translateY(0);
+        }
+    }
+    
+	@else if $direction==left {
+        transform: translateX(-50px);
+        &.animated {
+            transform: translateX(0);
+        }
+	}
+}

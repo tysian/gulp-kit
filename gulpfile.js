@@ -1,135 +1,156 @@
-var gulp = require('gulp');
-var browserSync = require('browser-sync');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var autoprefixer = require('gulp-autoprefixer');
-var cleanCSS = require('gulp-clean-css');
-var concat = require('gulp-concat');
-var imagemin = require('gulp-imagemin');
-var changed = require('gulp-changed');
-var htmlReaplce = require('gulp-html-replace');
-var htmlMin = require('gulp-htmlmin');
-var del = require('del');
-var sequence = require('run-sequence');
-var php = require('gulp-connect-php');
-var babili = require("gulp-babili");
+'use strict';
 
+// GULP
+const gulp 			= require('gulp');
 
-var config = {
-  dist: 'dist/',
-  src: 'src/',
-  cssin: 'src/css/**/*.css',
-  jsin: 'src/js/**/*.js',
-  imgin: 'src/img/**/*.{jpg,jpeg,png,gif}',
-  htmlin: 'src/*.html',
-  phpin: 'src/*.php',
-  scssin: 'src/scss/**/*.scss',
-  cssout: 'dist/css/',
-  jsout: 'dist/js/',
-  imgout: 'dist/img/',
-  htmlout: 'dist/',
-  scssout: 'src/css/',
-  cssoutname: 'style.css',
-  jsoutname: 'script.js',
-  docsin: 'src/docs/*.pdf',
-  docsout: 'dist/docs',
-  cssreplaceout: 'css/style.css',
-  jsreplaceout: 'js/script.js'
+//HTML
+const htmlMin		= require('gulp-htmlmin');
+const htmlReplace 	= require('gulp-html-replace');
+
+//CSS
+const sass 			= require('gulp-sass');
+const cssnano 		= require('gulp-cssnano');
+const autoprefixer 	= require('gulp-autoprefixer');
+
+// JS
+const concat 		= require('gulp-concat');
+const babel 		= require('gulp-babel');
+
+// UTILITY
+const sourcemaps 	= require('gulp-sourcemaps');
+const watch 		= require('gulp-watch');
+const browserSync	= require('browser-sync');
+const changed 		= require('gulp-changed');
+const sequence 		= require('run-sequence');
+
+//IMAGES
+const imagemin 		= require('gulp-imagemin')
+
+// use gulp-plumber in case of errors crashing
+
+const dirs = {
+	nodeModules: './node_modules',
+	src: './src',
+	dist: './dist'
 };
 
-// setup php server
-gulp.task('php', function () {
-  php.server({
-    base: 'src',
-    port: 8010,
-    keepalive: true
-  });
+gulp.task('sass', () => {
+	return gulp.src(dirs.src + '/scss/**/*.scss')
+		.pipe(sourcemaps.init())
+		.pipe(sass({
+				outputStyle: 'compressed',
+				errLogToConsole: true
+			})
+			.on('error', sass.logError))
+		.pipe(autoprefixer({
+			browsers: ['last 3 versions']
+		}))
+		.pipe(concat('style.min.css'))
+		.pipe(sourcemaps.write('../maps'))
+		.pipe(gulp.dest(dirs.dist + '/css'))
+		.pipe(browserSync.stream());
+
 });
 
-// browsersync reload
-gulp.task('reload', function () {
-  browserSync.reload();
+gulp.task('js', () => {
+	return gulp.src(dirs.src + '/js/**/*.js')
+		.pipe(sourcemaps.init())
+		.pipe(babel())
+		.pipe(concat('scripts.min.js'))
+		.pipe(sourcemaps.write('../maps'))
+		.pipe(gulp.dest(dirs.dist + '/js'));
 });
 
-gulp.task('serve', ['sass', 'php'], function () {
-  browserSync({
-    cors: true,
-    open: false,
-    proxy: "127.0.0.1:8010",
-    port: '8080'
-  });
-
-  gulp.watch([config.htmlin, config.jsin, config.phpin], ['reload']);
-  gulp.watch(config.scssin, ['sass']);
+gulp.task('styles-dependencies', () => {
+	return gulp.src([
+			// list of css dependencies
+			dirs.nodeModules + '/bootstrap/dist/css/bootstrap.min.css',
+			dirs.nodeModules + '/@fortawesome/fontawesome-free/css/all.css',
+		])
+		.pipe(cssnano({
+			discardComments: {
+				removeAll: true
+			}
+		}))
+		.pipe(concat('dependencies.min.css'))
+		.pipe(gulp.dest(dirs.dist + '/css'));
 });
 
-gulp.task('sass', function () {
-  return gulp.src(config.scssin)
-    .pipe(sourcemaps.init())
-    .pipe(sass().on('error', sass.logError))
-    .pipe(autoprefixer({
-      browsers: ['last 3 versions']
-    }))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(config.scssout))
-    .pipe(browserSync.stream());
+gulp.task('scripts-dependencies', () => {
+	return gulp.src([
+			//list of js dependencies
+			dirs.nodeModules + '/jquery/dist/jquery.min.js',
+			dirs.nodeModules + '/popper.js/dist/umd/popper.min.js',
+			dirs.nodeModules + '/bootstrap/dist/js/bootstrap.min.js',
+		])
+		.pipe(concat('dependencies.min.js'))
+		.pipe(gulp.dest(dirs.dist + '/js'));
 });
 
-gulp.task('css', function () {
-  return gulp.src(config.cssin)
-    .pipe(concat(config.cssoutname))
-    .pipe(cleanCSS())
-    .pipe(gulp.dest(config.cssout));
+
+gulp.task('img', () => {
+	return gulp.src(dirs.src + '/images/**/*.{jpg,jpeg,png,gif,svg,ico}')
+		.pipe(changed(dirs.dist + '/images'))
+		.pipe(imagemin({
+			svgoPlugins: [{
+				inlineStyles: true,
+				removeComments: true,
+				removeTitle: true,
+				removeDesc: true,
+				removeDimensions: true
+			}]
+		}))
+		.pipe(gulp.dest(dirs.dist + '/images'));
 });
 
-gulp.task('js', function () {
-  return gulp.src(config.jsin)
-    .pipe(concat(config.jsoutname))
-    .pipe(babili())
-    .pipe(gulp.dest(config.jsout));
-});
-
-gulp.task('img', function () {
-  return gulp.src(config.imgin)
-    .pipe(changed(config.imgout))
-    .pipe(imagemin())
-    .pipe(gulp.dest(config.imgout));
-});
 
 gulp.task('html', function () {
-  return gulp.src(config.htmlin)
-    .pipe(htmlReaplce({
-      'css': config.cssreplaceout,
-      'js': config.jsreplaceout
-    }))
-    .pipe(htmlMin({
-      sortAttributes: true,
-      sortClassName: true,
-      collapseWhitespace: true
-    }))
-    .pipe(gulp.dest(config.dist));
+	return gulp.src(dirs.src + '/**/*.html')
+		.pipe(htmlMin({
+			sortAttributes: true,
+			sortClassName: true,
+			collapseWhitespace: true
+		}))
+		.pipe(htmlReplace({
+			'css': './css/style.min.css',
+			'js': './js/scripts.min.js'
+		}))
+		.pipe(gulp.dest(dirs.dist));
 });
 
-gulp.task('clean', function () {
-  return del([config.dist]);
+
+gulp.task('fonts', function () {
+	return gulp.src([
+			dirs.src + '/fonts/**/*',
+			dirs.nodeModules + '/@fortawesome/fontawesome-free/webfonts/**/*'
+		])
+		.pipe(gulp.dest(dirs.dist + '/webfonts'));
 });
 
-gulp.task('docs', function () {
-  return gulp.src(config.docsin)
-    .pipe(gulp.dest(config.docsout));
+gulp.task('serve', () => {
+
+	const hosts = 'example.com';
+
+	browserSync.init({
+		server: "dist/",
+		// proxy: hosts, //use proxy or server
+		// host: hosts,
+		// open: 'external',
+		// port: 3333,
+	});
+
+	watch(dirs.src + '/scss/**/*.scss', () => gulp.start('sass'));
+	watch(dirs.src + '/js/**/*.js', () => {
+		gulp.start('js');
+		browserSync.reload();
+	});
+	watch(dirs.src + '/images/**/*.{jpg,jpeg,png,gif,svg}', () => gulp.start('img'));
+	watch(dirs.src + '/fonts/**/*.**', () => gulp.start('fonts'));
+	watch('./**/*.html', () => {
+		gulp.start('html');
+		browserSync.reload();
+	}).unwatch('./node_modules');
 });
 
-gulp.task('movephp', function () {
-  return gulp.src([config.phpin, 'src/*.txt', ])
-    .pipe(gulp.dest(config.htmlout));
-});
-gulp.task('move', function () {
-  return gulp.src(['src/lib/**/*.*'])
-    .pipe(gulp.dest('dist/lib/'));
-});
 
-gulp.task('build', function () {
-  sequence('clean', ['html', 'js', 'css', 'img', 'move', 'movephp', 'docs']);
-});
-
-gulp.task('default', ['serve']);
+gulp.task('default', () => sequence(['html', 'styles-dependencies', 'scripts-dependencies', 'sass', 'js', 'img', 'fonts'], 'serve'));
