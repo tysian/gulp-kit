@@ -36,7 +36,7 @@ Basically it takes all your scss and js files from its own folders, **BUT** if y
 There is a one task `styles-dependencies` for stylings and `scripts-dependencies` for scripts. 
 Simply just add a path to the js/css file: 
 ```javascript
-    dirs.nodeModules + '/path/to/the/style.min.css',
+dirs.nodeModules + '/path/to/the/style.min.css',
 ```
 **DONT FORGET TO ADD `dirs.nodeModules` AT THE BEGINNING!**
 
