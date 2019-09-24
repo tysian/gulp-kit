@@ -146,7 +146,7 @@ gulp.task('serve', () => {
 	});
 	watch(dirs.src + '/images/**/*.{jpg,jpeg,png,gif,svg}', () => gulp.start('img'));
 	watch(dirs.src + '/fonts/**/*.**', () => gulp.start('fonts'));
-	watch(dirs.src + './**/*.html', () => {
+	watch(dirs.src + '/**/*.html', () => {
 		gulp.start('html');
 		browserSync.reload();
 	}).unwatch('./node_modules');
