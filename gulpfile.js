@@ -129,7 +129,7 @@ gulp.task('fonts', function () {
 
 gulp.task('serve', () => {
 
-	const hosts = 'example.com';
+	// const hosts = 'example.com';
 
 	browserSync.init({
 		server: "dist/",
@@ -146,7 +146,7 @@ gulp.task('serve', () => {
 	});
 	watch(dirs.src + '/images/**/*.{jpg,jpeg,png,gif,svg}', () => gulp.start('img'));
 	watch(dirs.src + '/fonts/**/*.**', () => gulp.start('fonts'));
-	watch('./**/*.html', () => {
+	watch(dirs.src + './**/*.html', () => {
 		gulp.start('html');
 		browserSync.reload();
 	}).unwatch('./node_modules');
